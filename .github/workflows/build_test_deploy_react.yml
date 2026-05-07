@@ -34,11 +34,11 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/github-pages@v3
-      -name: Upload artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           path: dist
-    
+
   # Deploy job
   deploy:
     # Deploy to the github-pages environment
@@ -53,6 +53,6 @@ jobs:
     # Add a dependency to the build job
     needs: build_test
     steps:
-      -name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
