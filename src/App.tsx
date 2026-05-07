@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import RegistrationForm from './components/RegistrationForm'
+// import RegistrationForm from './components/RegistrationForm'
 function App() {
 
   let [count, setCount] = useState(0);
@@ -12,7 +12,7 @@ function App() {
       <button onClick={clickOnMe}>Click me</button>
       <span data-testid="count">{count}</span>
 
-      <RegistrationForm />
+      {/* <RegistrationForm /> */}
     </>
   )
 }
