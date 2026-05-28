@@ -45,7 +45,7 @@ jobs:
       - name: authenticate with npm
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-     - name: Check package versions
+      - name: Check package versions
         id: check-version
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
