@@ -26,9 +26,9 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: npm ci, build and test
@@ -41,10 +41,8 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
       - name: authenticate with npm
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Check package versions
         id: check-version
         run: |
@@ -58,7 +56,6 @@ jobs:
 
           echo "Version locale : $LOCAL_VERSION"
           echo "Version distante (NPM) : $REMOTE_VERSION"
-
       - name: build and publish package on NPM
         if: steps.check-version.outputs.local_version != steps.check-version.outputs.remote_version
         run: |
@@ -66,12 +63,11 @@ jobs:
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@v5
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
@@ -91,4 +87,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
