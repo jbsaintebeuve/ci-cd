@@ -41,6 +41,32 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: authenticate with npm
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+     - name: Check package versions
+        id: check-version
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+
+          REMOTE_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "0.0.0")
+
+          echo "local_version=$LOCAL_VERSION" >> $GITHUB_OUTPUT
+          echo "remote_version=$REMOTE_VERSION" >> $GITHUB_OUTPUT
+
+          echo "Version locale : $LOCAL_VERSION"
+          echo "Version distante (NPM) : $REMOTE_VERSION"
+
+      - name: build and publish package on NPM
+        if: steps.check-version.outputs.local_version != steps.check-version.outputs.remote_version
+        run: |
+          npm run build-npm-ci
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

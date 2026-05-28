@@ -1,7 +1,7 @@
 {
-  "name": "react",
-  "private": true,
-  "version": "0.0.0",
+  "name": "ci-cd-jbsaintebeuve",
+  "private": false,
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,8 @@
     "test:coverage": "vitest run --coverage",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./public/docs"
+    "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./public/docs",
+    "build-npm-ci": "NODE_ENV=production && rm -rf dist && mkdir dist && npx babel src --out-dir dist --copy-files"
   },
   "homepage": "https://jbsaintebeuve.github.io/ci-cd",
   "dependencies": {
@@ -29,7 +30,9 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
+    "@babel/cli": "^7.29.7",
+    "@babel/core": "^7.29.7",
+    "@babel/plugin-transform-react-jsx": "^7.29.7",
     "@eslint/js": "^10.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/postcss": "^4.2.4",

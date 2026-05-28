@@ -7,6 +7,15 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       reporter: ['text', 'json', 'html'],
+      exclude: [
+        'src/main.tsx',
+        'src/components/ui/**',
+        'dist/**',
+        'docs/**',
+        'public/docs/**',
+        '*.config.*',
+        '*.cjs',
+      ],
     },
     setupFiles: ['./vitest-setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
