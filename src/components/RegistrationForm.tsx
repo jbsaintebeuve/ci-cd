@@ -134,7 +134,7 @@ export default function RegistrationForm() {
                 {birthDateLabel}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start">
+            <PopoverContent className="bg-white p-0" align="start">
               <Calendar
                 mode="single"
                 selected={form.birthDate}
@@ -187,7 +187,7 @@ export default function RegistrationForm() {
         </div>
 
         <div className="pt-2">
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full bg-black text-white cursor-pointer">
             Sauvegarder
           </Button>
         </div>
