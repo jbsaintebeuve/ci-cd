@@ -1,7 +1,7 @@
 {
   "name": "ci-cd-jbsaintebeuve",
   "private": false,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,7 @@
     "predeploy": "npm run jsdoc && npm run build",
     "deploy": "gh-pages -d dist",
     "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./public/docs",
-    "build-npm-ci": "NODE_ENV=production && rm -rf dist && mkdir dist && npx babel src --out-dir dist --copy-files"
+    "build-npm-ci": "NODE_ENV=production && rm -rf lib && mkdir lib && npx babel src --out-dir lib --copy-files"
   },
   "homepage": "https://jbsaintebeuve.github.io/ci-cd/",
   "dependencies": {
