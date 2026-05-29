@@ -1,7 +1,7 @@
 {
   "name": "ci-cd-jbsaintebeuve",
   "private": false,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,7 @@
     "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./public/docs",
     "build-npm-ci": "NODE_ENV=production && rm -rf dist && mkdir dist && npx babel src --out-dir dist --copy-files"
   },
-  "homepage": "https://jbsaintebeuve.github.io/ci-cd",
+  "homepage": "https://jbsaintebeuve.github.io/ci-cd/",
   "dependencies": {
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
