@@ -1,76 +1,98 @@
+# ci-cd-jbsaintebeuve
 
-# React + TypeScript + Vite
+[![CI/CD](https://github.com/jbsaintebeuve/ci-cd/actions/workflows/build_test_deploy_react.yml/badge.svg)](https://github.com/jbsaintebeuve/ci-cd/actions)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application React d'inscription avec validation de formulaire, persistance locale et pipeline CI/CD complet.
 
-Currently, two official plugins are available:
+## Fonctionnalités
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Formulaire d'inscription avec validation en temps réel (nom, prénom, email, date de naissance, ville, code postal)
+- Sélecteur de date avec `react-day-picker`
+- Validation côté client (nom, email, code postal, majorité 18+)
+- Liste des inscrits mise à jour automatiquement (stockage localStorage + événements cross-onglets)
+- Notifications toast avec `sonner`
+- Interface responsive avec Tailwind CSS v4 et shadcn/ui
 
-## React Compiler
+## Stack technique
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+| Technologie | Version |
+|-------------|---------|
+| React | 19 |
+| TypeScript | ~6.0 |
+| Vite | 8 |
+| Tailwind CSS | 4 |
+| shadcn/ui | — |
+| Vitest | 3 |
+| JSDoc | 4 |
 
-Note: This will impact Vite dev & build performances.
+## Prérequis
 
-## Expanding the ESLint configuration
+- Node.js 20+
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Commande | Description |
+|----------|-------------|
+| `npm run dev` | Lance le serveur de développement |
+| `npm run build` | Compile TypeScript + build production |
+| `npm run preview` | Prévisualise le build de production |
+| `npm test` | Exécute les tests avec couverture |
+| `npm run lint` | Vérifie le code avec ESLint |
+| `npm run jsdoc` | Génère la documentation JSDoc dans `public/docs/` |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Structure du projet
+
 ```
+src/
+├── main.tsx                       # Point d'entrée
+├── App.tsx                        # Composant racine
+├── index.css                      # Styles Tailwind
+├── components/
+│   ├── RegistrationForm.tsx       # Formulaire d'inscription
+│   ├── UserList.tsx               # Liste des inscrits
+│   └── ui/                        # Primitives shadcn/ui
+│       ├── button.tsx
+│       ├── calendar.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       └── popover.tsx
+├── lib/
+│   └── utils.ts                   # Utilitaire de classes Tailwind (cn)
+├── services/
+│   └── storageService.ts          # Persistance localStorage
+└── utils/
+    └── validation.ts              # Fonctions de validation
+```
+
+## CI/CD
+
+Sur chaque push ou Pull Request vers `main`, le pipeline GitHub Actions :
+
+1. Installe les dépendances
+2. Génère la documentation JSDoc
+3. Compile le projet
+4. Exécute les tests avec couverture (istanbul)
+5. Publie sur npm (version taguée)
+6. Déploie sur GitHub Pages
+
+## Documentation
+
+La documentation JSDoc est accessible à l'adresse :
+
+[https://jbsaintebeuve.github.io/ci-cd/docs/](https://jbsaintebeuve.github.io/ci-cd/docs/)
+
+Génération locale :
+
+```bash
+npm run jsdoc
+```
+
+## Licence
+
+ISC

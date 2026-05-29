@@ -1,3 +1,4 @@
+/** Données saisies dans le formulaire d'inscription */
 export type FormData = {
   lastName: string
   firstName: string
@@ -7,24 +8,45 @@ export type FormData = {
   postalCode: string
 }
 
+/** Erreurs de validation indexées par champ du formulaire */
 export type FormErrors = Partial<Record<keyof FormData, string>>
 
-/** VERIF NOM VALIDE */
+/**
+ * Vérifie qu'un nom/prénom ne contient que des lettres, espaces, apostrophes ou tirets.
+ *
+ * @param value - La chaîne à valider
+ * @returns `true` si la chaîne est valide
+ */
 export function isValidName(value: string): boolean {
   return /^[\p{L}\s'\-]+$/u.test(value.trim())
 }
 
-/** VERIF EMAIL VALIDE */
+/**
+ * Vérifie qu'un email respecte le format basique `texte@texte.texte`.
+ *
+ * @param value - L'email à valider
+ * @returns `true` si le format est correct
+ */
 export function isValidEmail(value: string): boolean {
   return /\S+@\S+\.\S+/.test(value.trim())
 }
 
-/** VERIF CODE POSTAL VALIDE */
+/**
+ * Vérifie qu'un code postal français est valide (5 chiffres).
+ *
+ * @param value - Le code postal à valider
+ * @returns `true` si le code postal est au format 5 chiffres
+ */
 export function isValidPostalCode(value: string): boolean {
   return /^\d{5}$/.test(value.trim())
 }
 
-/** VERIF MAJEUR (18 ANS) */
+/**
+ * Vérifie si une date de naissance correspond à une personne majeure (18 ans ou plus).
+ *
+ * @param birthDate - La date de naissance à vérifier
+ * @returns `true` si l'âge est supérieur ou égal à 18 ans
+ */
 export function isAdult(birthDate: Date): boolean {
   const today = new Date()
   let age = today.getFullYear() - birthDate.getFullYear()
@@ -35,7 +57,12 @@ export function isAdult(birthDate: Date): boolean {
   return age >= 18
 }
 
-/** VALIDER FORMULAIRE ET RETOURNER ERREURS */
+/**
+ * Valide l'intégralité du formulaire et retourne les erreurs champ par champ.
+ *
+ * @param data - Les données du formulaire à valider
+ * @returns Objet contenant les messages d'erreur pour chaque champ invalide (vide si tout est valide)
+ */
 export function validateForm(data: FormData): FormErrors {
   const errors: FormErrors = {}
 
