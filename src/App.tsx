@@ -1,18 +1,13 @@
-import { useState } from 'react'
-// import RegistrationForm from './components/RegistrationForm'
+import { Toaster } from "sonner"
+import RegistrationForm from './components/RegistrationForm'
+import UserList from './components/UserList'
+
 function App() {
-
-  let [count, setCount] = useState(0);
-  const clickOnMe = () => {
-  setCount(count+1);
-  }
-
   return (
     <>
-      <button onClick={clickOnMe}>Click me</button>
-      <span data-testid="count">{count}</span>
-
-      {/* <RegistrationForm /> */}
+      <RegistrationForm />
+      <UserList />
+      <Toaster richColors position="top-right" />
     </>
   )
 }

@@ -1,21 +1,25 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/vitest';
-import App from './App';
-/**
- * Test the counter on click me button
- */
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import App from './App'
+
+const sonnerMocks = vi.hoisted(() => ({
+  toast: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+  Toaster: vi.fn(() => null),
+}))
+
+vi.mock("sonner", () => sonnerMocks)
+
+beforeEach(() => {
+  localStorage.clear()
+})
+
 describe('App', () => {
-  it('check counter on click me button', () => {
-    render(<App />);
-    const button = screen.getByRole('button', { name: /click me/i });
-    const counter = screen.getByTestId('count');
-
-    expect(button).toBeInTheDocument();
-    expect(counter).toBeInTheDocument();
-    expect(counter).toHaveTextContent('0');
-
-    fireEvent.click(button);
-    expect(counter).toHaveTextContent('1');
-  });
-});
+  it('affiche le formulaire et la liste des inscrits', () => {
+    render(<App />)
+    expect(screen.getByText(/formulaire d'inscription/i)).toBeInTheDocument()
+    expect(screen.getByText(/inscrits/i)).toBeInTheDocument()
+  })
+})
