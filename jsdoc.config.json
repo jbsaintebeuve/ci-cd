@@ -1,11 +1,22 @@
 {
   "source": {
     "include": [ "src/" ],
-    "exclude": [ "node_modules/", ".*\\.test\\.[jt]sx?$" ]
+    "exclude": [ "node_modules/", ".*\\.test\\.[jt]sx?$" ],
+    "includePattern": ".+\\.(js|jsx|ts|tsx)$"
   },
   "opts": {
     "recurse": true,
     "encoding": "utf8"
+  },
+  "plugins": ["node_modules/jsdoc-babel"],
+  "babel": {
+    "extensions": ["js", "jsx", "ts", "tsx"],
+    "configFile": false,
+    "presets": [
+      "@babel/preset-env",
+      ["@babel/preset-react", { "runtime": "automatic" }],
+      "@babel/preset-typescript"
+    ]
   },
   "templates": {
     "cleverLinks": true,
