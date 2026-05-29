@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run --coverage --watch=false",
     "test:coverage": "vitest run --coverage",
-    "predeploy": "npm run build",
+    "predeploy": "npm run jsdoc && npm run build",
     "deploy": "gh-pages -d dist",
     "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./public/docs",
     "build-npm-ci": "NODE_ENV=production && rm -rf dist && mkdir dist && npx babel src --out-dir dist --copy-files"
