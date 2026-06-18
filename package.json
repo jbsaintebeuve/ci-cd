@@ -1,9 +1,9 @@
 {
   "name": "ci-cd-jbsaintebeuve",
   "private": false,
-  "version": "0.2.2",
+  "version": "0.3.0",
   "type": "module",
-  
+
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
