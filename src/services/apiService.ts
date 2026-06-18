@@ -117,7 +117,7 @@ export async function updateUser(id: number, payload: CreateUserPayload): Promis
  * Tente une connexion administrateur avec les identifiants fournis.
  *
  * @param payload - L'email et le mot de passe
- * @returns `true` si le serveur a renvoyé `{ success: true }`, sinon `false`
+ * @returns {boolean} `true` si le serveur a renvoyé `{ success: true }`, sinon `false`
  * @throws {Error} Si la réponse HTTP du serveur n'est pas ok
  */
 export async function login(payload: LoginPayload): Promise<boolean> {
