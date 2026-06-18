@@ -1,5 +1,5 @@
 /** URL de base du serveur backend */
-const API_BASE = 'http://localhost:8000'
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 /** Représentation client d'un utilisateur après mapping depuis l'API */
 export type User = {
