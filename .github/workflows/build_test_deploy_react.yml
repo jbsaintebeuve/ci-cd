@@ -42,13 +42,13 @@ jobs:
           npm ci
           npm test
       - name: Install Vercel CLI
-        run npm install --global versel@lastest
+        run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information
-        run : vercel pull --yes --environment=preview --tocken=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN}}
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:

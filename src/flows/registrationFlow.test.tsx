@@ -128,7 +128,7 @@ describe("Flux d'inscription — cas d'usage", () => {
     vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(new Date(2005, 0, 1))
 
-    // GET users (1 user) → POST create (error)
+    // GET users (1 user) → POST create (error) → GET users again
     vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce({
         ok: true,
@@ -136,6 +136,10 @@ describe("Flux d'inscription — cas d'usage", () => {
       } as Response)
       .mockResolvedValueOnce({
         ok: false,
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ utilisateurs: RAW_USERS }),
       } as Response)
 
     // Render UserList — should show 1 user

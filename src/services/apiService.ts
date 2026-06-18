@@ -40,18 +40,21 @@ export async function fetchUsers(): Promise<User[]> {
   const res = await fetch(`${API_BASE}/users`)
   if (!res.ok) throw new Error('Erreur lors de la récupération des utilisateurs')
   const data = await res.json()
-  return data.utilisateurs.map(
-    (u: Record<string, unknown>) =>
-      ({
-        id: u.id as number,
-        lastName: u.nom as string,
-        firstName: u.prenom as string,
-        email: u.email as string,
-        birthDate: u.date_naissance as string,
-        city: u.ville as string,
-        postalCode: u.code_postal as string,
-      }) satisfies User,
-  )
+  if (!Array.isArray(data.utilisateurs)) return []
+  return data.utilisateurs
+    .filter((u: unknown): u is Record<string, unknown> => u != null)
+    .map(
+      (u: Record<string, unknown>) =>
+        ({
+          id: u.id as number,
+          lastName: u.nom as string,
+          firstName: u.prenom as string,
+          email: u.email as string,
+          birthDate: u.date_naissance as string,
+          city: u.ville as string,
+          postalCode: u.code_postal as string,
+        }) satisfies User,
+    )
 }
 
 /**
