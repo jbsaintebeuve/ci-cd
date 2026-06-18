@@ -22,15 +22,24 @@ _pool = None
 def _get_pool():
     global _pool
     if _pool is None:
+        db_config = {
+            "database": os.getenv("MYSQL_DATABASE"),
+            "user": os.getenv("MYSQL_USER"),
+            "password": os.getenv("MYSQL_ROOT_PASSWORD"),
+            "port": int(os.getenv("MYSQL_PORT", "3306")),
+            "host": os.getenv("MYSQL_HOST"),
+        }
+        missing = [k for k, v in db_config.items() if not v]
+        if missing:
+            raise RuntimeError(
+                f"Missing MySQL environment variables: {', '.join(missing)}. "
+                "Set them in Vercel dashboard (Settings > Environment Variables)."
+            )
         _pool = mysql.connector.pooling.MySQLConnectionPool(
             pool_name="mypool",
             pool_size=5,
             pool_reset_session=True,
-            database=os.getenv("MYSQL_DATABASE"),
-            user=os.getenv("MYSQL_USER"),
-            password=os.getenv("MYSQL_ROOT_PASSWORD"),
-            port=int(os.getenv("MYSQL_PORT", "3306")),
-            host=os.getenv("MYSQL_HOST"),
+            **db_config,
         )
     return _pool
 
