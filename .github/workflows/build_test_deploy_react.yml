@@ -37,6 +37,23 @@ jobs:
           npm run jsdoc
           npm run build --if-present
           npm test
+      - name: npm ci and test
+        run: |
+          npm ci
+          npm test
+      - name: Install Vercel CLI
+        run npm install --global versel@lastest
+      - name: Pull Vercel Environment Information
+        run : vercel pull --yes --environment=preview --tocken=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN}}
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm run build
+          start: npm start
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -88,3 +105,66 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push frontend image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend -f Dockerfile.react .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend
+      - name: Build and push backend image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend -f server/Dockerfile.server .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend
+
+  test-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create .env file
+        run: |
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" > .env
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
+      - name: Start docker compose
+        run: docker compose -p ci-cd up -d
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services to be healthy..."
+          max_wait=180
+          elapsed=0
+          while [ $elapsed -lt $max_wait ]; do
+            db_status=$(docker inspect --format '{{json .State.Health.Status}}' ci-cd-db-1 2>/dev/null || echo '"unavailable"')
+            adminer_status=$(docker inspect --format '{{json .State.Health.Status}}' ci-cd-adminer-1 2>/dev/null || echo '"unavailable"')
+            server_status=$(docker inspect --format '{{json .State.Health.Status}}' ci-cd-server-1 2>/dev/null || echo '"unavailable"')
+            react_status=$(docker inspect --format '{{json .State.Status}}' ci-cd-react-1 2>/dev/null || echo '"unavailable"')
+            echo "[$elapsed s] db=$db_status adminer=$adminer_status server=$server_status react=$react_status"
+            if [ "$db_status" = '"healthy"' ] && [ "$adminer_status" = '"healthy"' ] && [ "$server_status" = '"healthy"' ] && [ "$react_status" = '"running"' ]; then
+              echo "All services are healthy!"
+              break
+            fi
+            sleep 10
+            elapsed=$((elapsed + 10))
+          done
+          if [ $elapsed -ge $max_wait ]; then
+            echo "Timeout waiting for services!"
+            docker compose -p ci-cd logs
+            exit 1
+          fi
+      - name: List running containers
+        run: docker ps
+      - name: Check db health
+        run: docker inspect --format '{{json .State.Health.Status}}' ci-cd-db-1 | jq '. == "healthy"'
+      - name: Check adminer health
+        run: docker inspect --format '{{json .State.Health.Status}}' ci-cd-adminer-1 | jq '. == "healthy"'
+      - name: Check server health
+        run: docker inspect --format '{{json .State.Health.Status}}' ci-cd-server-1 | jq '. == "healthy"'
+      - name: Check react status
+        run: docker inspect --format '{{json .State.Status}}' ci-cd-react-1

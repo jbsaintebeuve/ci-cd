@@ -1,0 +1,6 @@
+nodes_modules
+build
+.dockerignore
+Dockerfile.react
+Dockerfile
+/server/Dockerfile.server

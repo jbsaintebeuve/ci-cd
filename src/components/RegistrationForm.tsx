@@ -11,7 +11,7 @@ import { Label } from "./ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Calendar } from "./ui/calendar"
 import { validateForm, type FormData } from "../utils/validation"
-import { saveUser } from "../services/storageService"
+import { useCreateUser } from "../hooks/useUsers"
 
 const INITIAL_FORM: FormData = {
   lastName: "",
@@ -25,6 +25,7 @@ const INITIAL_FORM: FormData = {
 export default function RegistrationForm() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM)
   const [submitted, setSubmitted] = useState(false)
+  const createUser = useCreateUser()
 
   const errors = useMemo(() => validateForm(form), [form])
   const isValid = Object.keys(errors).length === 0
@@ -43,17 +44,26 @@ export default function RegistrationForm() {
     setSubmitted(true)
     if (!isValid) return
 
-    saveUser({
-      lastName: form.lastName.trim(),
-      firstName: form.firstName.trim(),
-      email: form.email.trim(),
-      birthDate: form.birthDate!.toISOString(),
-      city: form.city.trim(),
-      postalCode: form.postalCode.trim(),
-    })
-    toast.success("Sauvegardé.")
-    setSubmitted(false)
-    setForm(INITIAL_FORM)
+    createUser.mutate(
+      {
+        lastName: form.lastName.trim(),
+        firstName: form.firstName.trim(),
+        email: form.email.trim(),
+        birthDate: form.birthDate!.toISOString(),
+        city: form.city.trim(),
+        postalCode: form.postalCode.trim(),
+      },
+      {
+        onSuccess: () => {
+          toast.success("Sauvegardé.")
+          setSubmitted(false)
+          setForm(INITIAL_FORM)
+        },
+        onError: () => {
+          toast.error("Erreur lors de la sauvegarde.")
+        },
+      },
+    )
   }
 
   return (
@@ -187,8 +197,12 @@ export default function RegistrationForm() {
         </div>
 
         <div className="pt-2">
-          <Button type="submit" className="w-full bg-black text-white cursor-pointer">
-            Sauvegarder
+          <Button
+            type="submit"
+            className="w-full bg-black text-white cursor-pointer"
+            disabled={createUser.isPending}
+          >
+            {createUser.isPending ? "Sauvegarde..." : "Sauvegarder"}
           </Button>
         </div>
       </form>

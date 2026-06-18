@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, fireEvent, cleanup } from "@testing-library/react"
+import { screen, fireEvent, cleanup, waitFor } from "@testing-library/react"
 
 import RegistrationForm from "./RegistrationForm"
-import { getUsers } from "../services/storageService"
+import { renderWithProviders } from "../test-utils"
 
 const sonnerMocks = vi.hoisted(() => ({
   toast: {
@@ -16,13 +16,20 @@ vi.mock("sonner", () => sonnerMocks)
 beforeEach(() => {
   sonnerMocks.toast.error.mockClear()
   sonnerMocks.toast.success.mockClear()
-  localStorage.clear()
+  vi.restoreAllMocks()
 })
 
 afterEach(() => {
   cleanup()
   vi.useRealTimers()
 })
+
+function mockFetchSuccess() {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+    ok: true,
+    json: async () => ({}),
+  } as Response)
+}
 
 function getSaveButton() {
   return screen.getAllByRole("button", { name: /sauvegarder/i })[0]
@@ -58,7 +65,7 @@ function selectBirthDate() {
 
 describe("RegistrationForm", () => {
   it("affiche tous les champs et le bouton", () => {
-    render(<RegistrationForm />)
+    renderWithProviders(<RegistrationForm />)
 
     expect(screen.getByLabelText(/^nom$/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/^prénom$/i)).toBeInTheDocument()
@@ -70,12 +77,12 @@ describe("RegistrationForm", () => {
   })
 
   it("bouton toujours activé pour permettre la validation visuelle", () => {
-    render(<RegistrationForm />)
+    renderWithProviders(<RegistrationForm />)
     expect(getSaveButton()).not.toBeDisabled()
   })
 
   it("affiche les erreurs pour un formulaire vide après soumission", () => {
-    render(<RegistrationForm />)
+    renderWithProviders(<RegistrationForm />)
 
     fireEvent.click(getSaveButton())
 
@@ -100,7 +107,7 @@ describe("RegistrationForm", () => {
   })
 
   it("messages d'erreur en rouge après soumission", () => {
-    render(<RegistrationForm />)
+    renderWithProviders(<RegistrationForm />)
 
     fireEvent.click(getSaveButton())
 
@@ -111,7 +118,7 @@ describe("RegistrationForm", () => {
   })
 
   it("ne soumet pas via Enter si le formulaire est invalide", () => {
-    render(<RegistrationForm />)
+    renderWithProviders(<RegistrationForm />)
 
     const form = screen.getByLabelText(/^nom$/i).closest("form")!
     fireEvent.submit(form)
@@ -120,11 +127,12 @@ describe("RegistrationForm", () => {
     expect(sonnerMocks.toast.error).not.toHaveBeenCalled()
   })
 
-  it("déclenche un toast success et sauvegarde dans localStorage quand le formulaire est valide", () => {
+  it("déclenche un toast success et appelle l'API quand le formulaire est valide", async () => {
     vi.useFakeTimers({ toFake: ["Date"] })
     vi.setSystemTime(new Date(2005, 0, 1))
 
-    render(<RegistrationForm />)
+    mockFetchSuccess()
+    renderWithProviders(<RegistrationForm />)
     fillValidFields()
     selectBirthDate()
 
@@ -136,13 +144,18 @@ describe("RegistrationForm", () => {
 
     fireEvent.click(getSaveButton())
 
-    expect(sonnerMocks.toast.success).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(sonnerMocks.toast.success).toHaveBeenCalledTimes(1)
+    })
     expect(sonnerMocks.toast.error).not.toHaveBeenCalled()
-    expect(getUsers()).toHaveLength(1)
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/users',
+      expect.objectContaining({ method: 'POST' }),
+    )
   })
 
   it("affiche une erreur si on deselectionne la date après l'avoir choisie", () => {
-    render(<RegistrationForm />)
+    renderWithProviders(<RegistrationForm />)
     fillValidFields()
 
     selectBirthDate()
@@ -159,11 +172,12 @@ describe("RegistrationForm", () => {
     ).toBeInTheDocument()
   })
 
-  it("vide les champs après une soumission réussie", () => {
+  it("vide les champs après une soumission réussie", async () => {
     vi.useFakeTimers({ toFake: ["Date"] })
     vi.setSystemTime(new Date(2005, 0, 1))
 
-    render(<RegistrationForm />)
+    mockFetchSuccess()
+    renderWithProviders(<RegistrationForm />)
     fillValidFields()
     selectBirthDate()
 
@@ -175,9 +189,11 @@ describe("RegistrationForm", () => {
 
     fireEvent.click(getSaveButton())
 
-    expect(
-      (screen.getByLabelText<HTMLInputElement>(/^nom$/i)).value
-    ).toBe("")
+    await waitFor(() => {
+      expect(
+        (screen.getByLabelText<HTMLInputElement>(/^nom$/i)).value
+      ).toBe("")
+    })
     expect(
       (screen.getByLabelText<HTMLInputElement>(/^prénom$/i)).value
     ).toBe("")
@@ -190,5 +206,32 @@ describe("RegistrationForm", () => {
     expect(
       (screen.getByLabelText<HTMLInputElement>(/^code postal$/i)).value
     ).toBe("")
+  })
+
+  it("affiche un toast d'erreur si la sauvegarde échoue", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] })
+    vi.setSystemTime(new Date(2005, 0, 1))
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: false,
+    } as Response)
+
+    renderWithProviders(<RegistrationForm />)
+    fillValidFields()
+    selectBirthDate()
+
+    vi.useRealTimers()
+
+    fireEvent.change(screen.getByLabelText(/^nom$/i), {
+      target: { value: "Dupont " },
+    })
+
+    fireEvent.click(getSaveButton())
+
+    await waitFor(() => {
+      expect(sonnerMocks.toast.error).toHaveBeenCalledWith(
+        "Erreur lors de la sauvegarde.",
+      )
+    })
   })
 })

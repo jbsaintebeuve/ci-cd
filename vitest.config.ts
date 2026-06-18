@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
         'src/main.tsx',
@@ -13,6 +13,10 @@ export default defineConfig({
         'dist/**',
         'docs/**',
         'public/docs/**',
+        'cypress/**',
+        'src/router.tsx',
+        'src/test-utils.tsx',
+        'module.ts',
         '*.config.*',
         '*.cjs',
       ],

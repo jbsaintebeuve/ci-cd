@@ -1,0 +1,74 @@
+services:
+  db:
+    image: mysql:9.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - ./sqlfiles:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: "mysqladmin ping -u root -p$$MYSQL_ROOT_PASSWORD || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  adminer:
+    depends_on:
+      db:
+        condition: service_healthy
+    image: adminer
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  server:
+    restart: always
+    volumes:
+      - ./server:/server
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile.server
+    image: migration_server
+    ports:
+      - 8000:8000
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PORT=${MYSQL_PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn server:app --proxy-headers --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/users')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    
+  react:
+    image: migration_react
+    build:
+      context: .
+      dockerfile: Dockerfile.react
+    ports:
+      - 5173:5173
+    environment:
+      - REACT_APP_SERVER_PORT=8000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - server
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:5173/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
