@@ -3,6 +3,7 @@ import { screen, fireEvent, cleanup, waitFor } from "@testing-library/react"
 
 import RegistrationForm from "./RegistrationForm"
 import { renderWithProviders } from "../test-utils"
+import { API_BASE } from "../services/apiService"
 
 const sonnerMocks = vi.hoisted(() => ({
   toast: {
@@ -149,7 +150,7 @@ describe("RegistrationForm", () => {
     })
     expect(sonnerMocks.toast.error).not.toHaveBeenCalled()
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:8000/users',
+      `${API_BASE}/users`,
       expect.objectContaining({ method: 'POST' }),
     )
   })

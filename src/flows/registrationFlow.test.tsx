@@ -3,6 +3,7 @@ import { screen, fireEvent, cleanup, waitFor } from '@testing-library/react'
 import RegistrationForm from '../components/RegistrationForm'
 import UserList from '../components/UserList'
 import { renderWithProviders } from '../test-utils'
+import { API_BASE } from '../services/apiService'
 
 const sonnerMocks = vi.hoisted(() => ({
   toast: {
@@ -110,7 +111,7 @@ describe("Flux d'inscription — cas d'usage", () => {
       expect(sonnerMocks.toast.success).toHaveBeenCalledWith('Sauvegardé.')
     })
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:8000/users',
+      `${API_BASE}/users`,
       expect.objectContaining({ method: 'POST' }),
     )
 

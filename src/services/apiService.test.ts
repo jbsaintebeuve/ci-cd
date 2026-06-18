@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fetchUsers, createUser, deleteUser, updateUser, login } from './apiService'
-
-const API_BASE = 'http://localhost:8000'
+import { fetchUsers, createUser, deleteUser, updateUser, login, API_BASE } from './apiService'
 
 const rawUsers = [
   {
