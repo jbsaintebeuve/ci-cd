@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "start": "vite preview",
     "preview": "vite preview",
     "test": "vitest run --coverage --watch=false",
     "test:coverage": "vitest run --coverage",
